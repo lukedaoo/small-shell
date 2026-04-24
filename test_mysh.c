@@ -5,15 +5,15 @@
 
 /* test framework */
 typedef struct {
-        int passed;
-        int failed;
+    int passed;
+    int failed;
 } test_suite;
 
 /* mysh function declarations */
 #define FALSE 0
 #define TRUE 1
 #define COMMAND_LIMIT_LENGTH 256
-#define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 64
+#define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 256
 #define DIRECTORY_LIMIT_PATH_LENGTH 1024
 
 int io_input_validate(char* buffer);
@@ -31,8 +31,7 @@ void test_print(const char* name, int passed) {
     }
 }
 
-void test_print_str(const char* name, int passed, const char* expected,
-                    const char* actual) {
+void test_print_str(const char* name, int passed, const char* expected, const char* actual) {
     if (passed) {
         printf("  PASS: %s\n", name);
     } else {
@@ -131,8 +130,8 @@ void test_group_argument_parsing(test_suite* suite) {
     strcpy(buffer, "ls -la /tmp");
     cmd_arguments_extract(buffer, args);
     passed = (args[0] != NULL && strcmp(args[0], "ls") == 0 && args[1] != NULL &&
-              strcmp(args[1], "-la") == 0 && args[2] != NULL &&
-              strcmp(args[2], "/tmp") == 0 && args[3] == NULL);
+              strcmp(args[1], "-la") == 0 && args[2] != NULL && strcmp(args[2], "/tmp") == 0 &&
+              args[3] == NULL);
     test_print("'ls -la /tmp' parses correctly", passed);
     if (passed) {
         suite->passed++;
@@ -222,26 +221,26 @@ void test_group_argument_validation(test_suite* suite) {
         suite->failed++;
     }
 
-    for (int i = 0; i < 62; i++) {
+    for (int i = 0; i < 256 - 2; i++) {
         args[i] = "arg";
     }
-    args[62] = NULL;
+    args[256 - 2] = NULL;
     result = cmd_arguments_validate(args);
     passed = (result == TRUE);
-    test_print_int("62 args returns TRUE", passed, 1, result);
+    test_print_int("254 args returns TRUE", passed, 1, result);
     if (passed) {
         suite->passed++;
     } else {
         suite->failed++;
     }
 
-    for (int i = 0; i < 63; i++) {
+    for (int i = 0; i < 256 - 1; i++) {
         args[i] = "arg";
     }
-    args[63] = NULL;
+    args[256 - 1] = NULL;
     result = cmd_arguments_validate(args);
     passed = (result == FALSE);
-    test_print_int("63 args returns FALSE", passed, 0, result);
+    test_print_int("255 args returns FALSE", passed, 0, result);
     if (passed) {
         suite->passed++;
     } else {

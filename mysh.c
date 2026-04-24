@@ -8,12 +8,11 @@
 #define TRUE 1
 
 #define COMMAND_LIMIT_LENGTH 256
-#define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 64
+#define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 256
 #define DIRECTORY_LIMIT_PATH_LENGTH 1024
 #define DEFAULT_PROMPT "mysh> "
 #define DEFAULT_SEPARATOR "$"
 
-/* types */
 typedef enum {
     COMMAND_TYPE_BUILTIN_CD,
     COMMAND_TYPE_BUILTIN_PWD,
@@ -21,31 +20,24 @@ typedef enum {
     COMMAND_TYPE_EXTERNAL
 } command_type;
 
-/* helpers */
-void dir_current_get(char* buffer, int buffer_size); /* get current directory */
-void io_input_get(char* buffer, int buffer_size);    /* get user input */
-int io_input_validate(char* buffer);                 /* validate user input */
-void io_print_str(const char* str);                  /* print string */
-void io_print_error(const char* str);                /* print error */
-void io_print_prompt(const char* current_dir, const char* separator,
-                     const char* prompt); /* print prompt */
+void dir_current_get(char* buffer, int buffer_size);
+void io_input_get(char* buffer, int buffer_size);
+int io_input_validate(char* buffer);
+void io_print_str(const char* str);
+void io_print_error(const char* str);
+void io_print_prompt(const char* current_dir, const char* separator, const char* prompt);
 
-/* commands */
-/* extract user input to list of arguments, first argument is the command, rest are
- * arguments of the command */
 void cmd_arguments_extract(char* user_input_buffer, char** arguments);
-int cmd_arguments_validate(char** arguments);        /* validate arguments */
-void cmd_command_execute(char** arguments);          /* execute command */
-void cmd_command_execute_external(char** arguments); /* execute external command */
+int cmd_arguments_validate(char** arguments);
+void cmd_command_execute(char** arguments);
+void cmd_command_execute_external(char** arguments);
 
-/* builtin commands */
-void cmd_command_execute_bultin(char** arguments,
-                                command_type type); /* execute builtin command */
-void cmd_exit_execute(void);                        /* exit */
-void cmd_cd_execute(char** arguments);              /* change directory */
-void cmd_pwd_execute(void);                         /* print working directory */
+void cmd_command_execute_bultin(char** arguments, command_type type);
+void cmd_exit_execute(void);
+void cmd_cd_execute(char** arguments);
+void cmd_pwd_execute(void);
 
-void run_shell(void); /* main entry point */
+void run_shell(void);
 
 int main() {
     run_shell();
@@ -245,7 +237,6 @@ void cmd_cd_execute(char** arguments) {
         target_path = getenv("HOME");
 
         if (target_path == NULL) {
-            io_print_error("HOME environment variable not set");
             return;
         }
     }
