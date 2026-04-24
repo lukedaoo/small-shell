@@ -8,7 +8,7 @@
 #define TRUE 1
 
 #define COMMAND_LIMIT_LENGTH 256
-#define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 256
+#define COMMAND_MAX_ARGS 256
 #define DIRECTORY_LIMIT_PATH_LENGTH 1024
 #define DEFAULT_PROMPT "mysh> "
 #define DEFAULT_SEPARATOR "$"
@@ -32,7 +32,7 @@ int cmd_arguments_validate(char** arguments);
 void cmd_command_execute(char** arguments);
 void cmd_command_execute_external(char** arguments);
 
-void cmd_command_execute_bultin(char** arguments, command_type type);
+void cmd_command_execute_builtin(char** arguments, command_type type);
 void cmd_exit_execute(void);
 void cmd_cd_execute(char** arguments);
 void cmd_pwd_execute(void);
@@ -61,7 +61,7 @@ void run_shell(void) {
             continue;
         }
         // 5. extract command
-        char* arguments[COMMAND_LIMIT_NUM_OF_ARG_LENGTH];
+        char* arguments[COMMAND_MAX_ARGS];
         cmd_arguments_extract(io_input_value, arguments);
         // 6. validate arguments
         if (!cmd_arguments_validate(arguments)) {
@@ -79,6 +79,7 @@ void dir_current_get(char* buffer, int buffer_size) {
         return;
     }
     io_print_error("getcwd failed");
+    buffer[0] = '\0';
 }
 
 void io_input_get(char* buffer, int buffer_size) {
@@ -112,28 +113,17 @@ int io_input_validate(char* buffer) {
         return FALSE;
     }
 
-    if (buffer[0] == '\0') {
-        return TRUE;
-    }
-
     return TRUE;
 }
 
 void io_print_str(const char* str) {
     if (str == NULL) return;
-    fprintf(stdout, "%s\n", str);
+    printf("%s\n", str);
     fflush(stdout);
 }
 
 void io_print_prompt(const char* current_dir, const char* separator, const char* prompt) {
-    if (current_dir) {
-        fputs(current_dir, stdout);
-    } else {
-        fputs("unknown", stdout);
-    }
-    fputs(separator, stdout);
-    fputs(prompt, stdout);
-
+    printf("%s%s%s", current_dir ? current_dir : "unknown", separator, prompt);
     fflush(stdout);
 }
 
@@ -155,7 +145,7 @@ void cmd_arguments_extract(char* user_input_buffer, char** arguments) {
 
     token = strtok_r(user_input_buffer, delims, &save_ptr);
 
-    while (token != NULL && i < (COMMAND_LIMIT_NUM_OF_ARG_LENGTH - 1)) {
+    while (token != NULL && i < (COMMAND_MAX_ARGS - 1)) {
         arguments[i++] = token;
         token = strtok_r(NULL, delims, &save_ptr);
     }
@@ -169,7 +159,7 @@ int cmd_arguments_validate(char** arguments) {
     while (arguments[i] != NULL) {
         i++;
     }
-    if (i >= COMMAND_LIMIT_NUM_OF_ARG_LENGTH - 1) {
+    if (i >= COMMAND_MAX_ARGS - 1) {
         return FALSE;
     }
     return TRUE;
@@ -192,13 +182,13 @@ void cmd_command_execute(char** arguments) {
     if (type == COMMAND_TYPE_EXTERNAL) {
         cmd_command_execute_external(arguments);
     } else {
-        cmd_command_execute_bultin(arguments, type);
+        cmd_command_execute_builtin(arguments, type);
     }
 }
 
 void cmd_command_execute_external(char** arguments) {
     if (arguments == NULL || arguments[0] == NULL) return;
-    const int child_pid = fork();
+    const pid_t child_pid = fork();
     if (child_pid < 0) {
         io_print_error("Failed to create process");
     } else if (child_pid == 0) {
@@ -212,7 +202,7 @@ void cmd_command_execute_external(char** arguments) {
     }
 }
 
-void cmd_command_execute_bultin(char** arguments, command_type type) {
+void cmd_command_execute_builtin(char** arguments, command_type type) {
     if (arguments == NULL || arguments[0] == NULL) return;
     if (type == COMMAND_TYPE_BUILTIN_CD) {
         cmd_cd_execute(arguments);
@@ -232,6 +222,7 @@ void cmd_cd_execute(char** arguments) {
         target_path = getenv("HOME");
 
         if (target_path == NULL) {
+            io_print_error("cd: HOME environment variable is not set");
             return;
         }
     }

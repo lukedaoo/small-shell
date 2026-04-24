@@ -13,7 +13,7 @@ typedef struct {
 #define FALSE 0
 #define TRUE 1
 #define COMMAND_LIMIT_LENGTH 256
-#define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 256
+#define COMMAND_MAX_ARGS 256
 #define DIRECTORY_LIMIT_PATH_LENGTH 1024
 
 int io_input_validate(char* buffer);
@@ -114,7 +114,7 @@ void test_group_argument_parsing(test_suite* suite) {
     printf("\n=== TEST GROUP 2: Argument Parsing (cmd_arguments_extract) ===\n");
 
     char buffer[COMMAND_LIMIT_LENGTH];
-    char* args[COMMAND_LIMIT_NUM_OF_ARG_LENGTH];
+    char* args[COMMAND_MAX_ARGS];
     int passed;
 
     strcpy(buffer, "ls");
@@ -186,7 +186,7 @@ void test_group_argument_parsing(test_suite* suite) {
 void test_group_argument_validation(test_suite* suite) {
     printf("\n=== TEST GROUP 3: Argument Validation (cmd_arguments_validate) ===\n");
 
-    char* args[COMMAND_LIMIT_NUM_OF_ARG_LENGTH];
+    char* args[COMMAND_MAX_ARGS];
     int result;
     int passed;
 
@@ -252,7 +252,7 @@ void test_group_argument_validation(test_suite* suite) {
 void test_group_builtin_cd(test_suite* suite) {
     printf("\n=== TEST GROUP 4: Built-in: cd ===\n");
 
-    char* args[COMMAND_LIMIT_NUM_OF_ARG_LENGTH];
+    char* args[COMMAND_MAX_ARGS];
     char cwd[DIRECTORY_LIMIT_PATH_LENGTH];
     char original_cwd[DIRECTORY_LIMIT_PATH_LENGTH];
     int passed;
