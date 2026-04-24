@@ -4,16 +4,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define EXIT_FAILURE 1
-#define EXIT_SUCCESS 0
-
 #define FALSE 0
 #define TRUE 1
 
 #define COMMAND_LIMIT_LENGTH 256
 #define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 64
 #define DIRECTORY_LIMIT_PATH_LENGTH 1024
-#define DEFAULT_PROMPT "mysh> "
+#define DEFAULT_PROMPT "mysh > "
 #define DEFAULT_SEPARATOR "$"
 
 /* types */
@@ -47,7 +44,16 @@ void cmd_exit_execute(void);                        /* exit */
 void cmd_cd_execute(char** arguments);              /* change directory */
 void cmd_pwd_execute(void);                         /* print working directory */
 
+void run_shell(void); /* main entry point */
+
+#ifndef TEST_MODE
 int main() {
+    run_shell();
+    return EXIT_SUCCESS;
+}
+#endif
+
+void run_shell(void) {
     char io_input_value[COMMAND_LIMIT_LENGTH];
     char dir_current_value[DIRECTORY_LIMIT_PATH_LENGTH];
 
@@ -74,8 +80,8 @@ int main() {
         // 7. execute command
         cmd_command_execute(arguments);
     }
-    return EXIT_SUCCESS;
 }
+
 /* helpers implementations */
 void dir_current_get(char* buffer, int buffer_size) {
     if (getcwd(buffer, buffer_size) != NULL) {
@@ -110,13 +116,9 @@ int io_input_validate(char* buffer) {
     } else {
         // if input is too long, extra characters stay in stdin,
         // so we clear them to avoid breaking the next input
-        int c = getchar();
-        if (c != '\n' && c != EOF) {
-            while (c != '\n' && c != EOF) {
-                c = getchar();
-            }
-            return FALSE;
-        }
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+        return FALSE;
     }
 
     if (buffer[0] == '\0') {
@@ -135,6 +137,7 @@ void io_print_prompt(char* current_dir, char* separator, char* prompt) {
     io_print_str(current_dir);
     io_print_str(separator);
     io_print_str(prompt);
+    fflush(stdout);
 }
 
 void io_print_error(char* str) {
