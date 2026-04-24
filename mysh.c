@@ -146,16 +146,17 @@ void io_print_error(char* str) {
 void cmd_arguments_extract(char* user_input_buffer, char** arguments) {
     if (user_input_buffer == NULL || arguments == NULL) return;
     char* token;
+    char* save_ptr;
     int i = 0;
 
-    token = strtok(user_input_buffer, " \t\n\r");
+    token = strtok_r(user_input_buffer, " \t\n\r", &save_ptr);
     while (token != NULL) {
         if (i < COMMAND_LIMIT_NUM_OF_ARG_LENGTH - 1) {
             arguments[i++] = token;
         } else {
             break;
         }
-        token = strtok(NULL, " \t\n\r");
+        token = strtok_r(NULL, " \t\n\r", &save_ptr);
     }
     arguments[i] = NULL;
 }
@@ -247,11 +248,7 @@ void cmd_cd_execute(char** arguments) {
 
 void cmd_pwd_execute(void) {
     char buffer[DIRECTORY_LIMIT_PATH_LENGTH];
-
-    if (getcwd(buffer, sizeof(buffer)) != NULL) {
-        io_print_str(buffer);
-        io_print_str("\n");
-    } else {
-        io_print_error("Could not retrieve current directory\n");
-    }
+    dir_current_get(buffer, DIRECTORY_LIMIT_PATH_LENGTH);
+    io_print_str(buffer);
+    io_print_str("\n");
 }

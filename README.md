@@ -26,7 +26,8 @@ Together, these illustrate the core lifecycle of process creation and execution 
 Run the following command in your terminal:
 
 ```bash
-make && ./small-shell
+make 
+```
 
 ## License
 MIT
