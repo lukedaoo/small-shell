@@ -10,7 +10,7 @@
 #define COMMAND_LIMIT_LENGTH 256
 #define COMMAND_LIMIT_NUM_OF_ARG_LENGTH 64
 #define DIRECTORY_LIMIT_PATH_LENGTH 1024
-#define DEFAULT_PROMPT "mysh > "
+#define DEFAULT_PROMPT "mysh> "
 #define DEFAULT_SEPARATOR "$"
 
 /* types */
@@ -25,9 +25,10 @@ typedef enum {
 void dir_current_get(char* buffer, int buffer_size); /* get current directory */
 void io_input_get(char* buffer, int buffer_size);    /* get user input */
 int io_input_validate(char* buffer);                 /* validate user input */
-void io_print_str(char* str);                        /* print string */
+void io_print_str(const char* str);                  /* print string */
 void io_print_error(const char* str);                /* print error */
-void io_print_prompt(char* current_dir, char* separator, char* prompt); /* print prompt */
+void io_print_prompt(const char* current_dir, const char* separator,
+                     const char* prompt); /* print prompt */
 
 /* commands */
 /* extract user input to list of arguments, first argument is the command, rest are
@@ -126,16 +127,21 @@ int io_input_validate(char* buffer) {
     return TRUE;
 }
 
-void io_print_str(char* str) {
+void io_print_str(const char* str) {
     if (str == NULL) return;
     fprintf(stdout, "%s\n", str);
     fflush(stdout);
 }
 
-void io_print_prompt(char* current_dir, char* separator, char* prompt) {
-    char full_prompt[DIRECTORY_LIMIT_PATH_LENGTH + 128];
-    snprintf(full_prompt, sizeof(full_prompt), "%s%s%s", current_dir, separator, prompt);
-    fprintf(stdout, "%s", full_prompt);
+void io_print_prompt(const char* current_dir, const char* separator, const char* prompt) {
+    if (current_dir) {
+        fputs(current_dir, stdout);
+    } else {
+        fputs("unknown", stdout);
+    }
+    fputs(separator, stdout);
+    fputs(prompt, stdout);
+
     fflush(stdout);
 }
 
@@ -203,7 +209,7 @@ void cmd_command_execute_external(char** arguments) {
     if (arguments == NULL || arguments[0] == NULL) {
         return;
     }
-    int child_pid = fork();
+    const int child_pid = fork();
     if (child_pid < 0) {
         io_print_error("Failed to create process");
     } else if (child_pid == 0) {

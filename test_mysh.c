@@ -64,45 +64,50 @@ void test_group_newline_stripping(test_suite* suite) {
     result = io_input_validate(buffer);
     passed = (result == TRUE && strcmp(buffer, "ls") == 0);
     test_print("'ls\\n' strips to 'ls', returns TRUE", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     strcpy(buffer, "ls -la\n");
     result = io_input_validate(buffer);
     passed = (result == TRUE && strcmp(buffer, "ls -la") == 0);
     test_print("'ls -la\\n' strips to 'ls -la', returns TRUE", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     strcpy(buffer, "\n");
     result = io_input_validate(buffer);
     passed = (result == TRUE && buffer[0] == '\0');
     test_print("'\\n' (only newline) strips to '', returns TRUE", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     buffer[0] = '\0';
     result = io_input_validate(buffer);
     passed = (result == FALSE);
     test_print_int("'' (empty string) returns FALSE", passed, 0, result);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     result = io_input_validate(NULL);
     passed = (result == FALSE);
     test_print_int("NULL buffer returns FALSE", passed, 0, result);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 }
 
 /* ===== TEST GROUP 2: Argument parsing (cmd_arguments_extract) ===== */
@@ -117,10 +122,11 @@ void test_group_argument_parsing(test_suite* suite) {
     cmd_arguments_extract(buffer, args);
     passed = (args[0] != NULL && strcmp(args[0], "ls") == 0 && args[1] == NULL);
     test_print("'ls' parses to args[0]='ls', args[1]=NULL", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     strcpy(buffer, "ls -la /tmp");
     cmd_arguments_extract(buffer, args);
@@ -128,48 +134,53 @@ void test_group_argument_parsing(test_suite* suite) {
               strcmp(args[1], "-la") == 0 && args[2] != NULL &&
               strcmp(args[2], "/tmp") == 0 && args[3] == NULL);
     test_print("'ls -la /tmp' parses correctly", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     strcpy(buffer, "ls  -la");
     cmd_arguments_extract(buffer, args);
     passed = (args[0] != NULL && strcmp(args[0], "ls") == 0 && args[1] != NULL &&
               strcmp(args[1], "-la") == 0 && args[2] == NULL);
     test_print("'ls  -la' (multiple spaces) parses as single space", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     strcpy(buffer, "ls\t-la");
     cmd_arguments_extract(buffer, args);
     passed = (args[0] != NULL && strcmp(args[0], "ls") == 0 && args[1] != NULL &&
               strcmp(args[1], "-la") == 0 && args[2] == NULL);
     test_print("'ls\\t-la' (tabs) parsed correctly", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     strcpy(buffer, "  ls  ");
     cmd_arguments_extract(buffer, args);
     passed = (args[0] != NULL && strcmp(args[0], "ls") == 0 && args[1] == NULL);
     test_print("'  ls  ' (leading/trailing spaces) parses to 'ls'", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     strcpy(buffer, "");
     cmd_arguments_extract(buffer, args);
     passed = (args[0] == NULL);
     test_print("'' (empty string) -> args[0]=NULL", passed);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 }
 
 /* ===== TEST GROUP 3: Argument validation (cmd_arguments_validate) ===== */
@@ -186,27 +197,30 @@ void test_group_argument_validation(test_suite* suite) {
     result = cmd_arguments_validate(args);
     passed = (result == TRUE);
     test_print_int("valid args array returns TRUE", passed, 1, result);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     result = cmd_arguments_validate(NULL);
     passed = (result == TRUE);
     test_print_int("NULL returns TRUE", passed, 1, result);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     args[0] = NULL;
     result = cmd_arguments_validate(args);
     passed = (result == TRUE);
     test_print_int("args[0]=NULL returns TRUE", passed, 1, result);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     for (int i = 0; i < 62; i++) {
         args[i] = "arg";
@@ -215,10 +229,11 @@ void test_group_argument_validation(test_suite* suite) {
     result = cmd_arguments_validate(args);
     passed = (result == TRUE);
     test_print_int("62 args returns TRUE", passed, 1, result);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     for (int i = 0; i < 63; i++) {
         args[i] = "arg";
@@ -227,10 +242,11 @@ void test_group_argument_validation(test_suite* suite) {
     result = cmd_arguments_validate(args);
     passed = (result == FALSE);
     test_print_int("63 args returns FALSE", passed, 0, result);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 }
 
 /* ===== TEST GROUP 4: Built-in: cd ===== */
@@ -251,23 +267,25 @@ void test_group_builtin_cd(test_suite* suite) {
     getcwd(cwd, sizeof(cwd));
     passed = (strcmp(cwd, "/tmp") == 0);
     test_print_str("cd /tmp -> cwd is /tmp", passed, "/tmp", cwd);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     args[0] = "cd";
     args[1] = NULL;
     cmd_cd_execute(args);
     getcwd(cwd, sizeof(cwd));
-    char* home = getenv("HOME");
+    const char* home = getenv("HOME");
     if (home) {
         passed = (strcmp(cwd, home) == 0);
         test_print_str("cd (no arg) -> changes to $HOME", passed, home, cwd);
-        if (passed)
+        if (passed) {
             suite->passed++;
-        else
+        } else {
             suite->failed++;
+        }
     }
 
     chdir("/tmp");
@@ -278,10 +296,11 @@ void test_group_builtin_cd(test_suite* suite) {
     getcwd(cwd, sizeof(cwd));
     passed = (strcmp(cwd, "/tmp") == 0);
     test_print_str("cd /nonexistent -> error, cwd unchanged", passed, "/tmp", cwd);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     chdir(original_cwd);
 }
@@ -299,7 +318,7 @@ void test_group_builtin_pwd(test_suite* suite) {
 
     int pipefd[2];
     pipe(pipefd);
-    int saved_stdout = dup(STDOUT_FILENO);
+    const int saved_stdout = dup(STDOUT_FILENO);
     dup2(pipefd[1], STDOUT_FILENO);
     close(pipefd[1]);
 
@@ -316,10 +335,11 @@ void test_group_builtin_pwd(test_suite* suite) {
 
     passed = (strcmp(actual, expected) == 0);
     test_print_str("pwd output matches getcwd()", passed, expected, actual);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 }
 
 /* ===== TEST GROUP 6: Error messages (stderr exact strings) ===== */
@@ -334,7 +354,7 @@ void test_group_error_messages(test_suite* suite) {
 
     int pipefd[2];
     pipe(pipefd);
-    int saved_stderr = dup(STDERR_FILENO);
+    const int saved_stderr = dup(STDERR_FILENO);
 
     /* test "Failed to create process\n" */
     dup2(pipefd[1], STDERR_FILENO);
@@ -348,10 +368,11 @@ void test_group_error_messages(test_suite* suite) {
     passed = (strcmp(actual, "Failed to create process\n") == 0);
     test_print_str("fork fail msg exact: \"Failed to create process\\n\"", passed,
                    "Failed to create process\n", actual);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 
     /* test "Failed to execute command\n" */
     pipe(pipefd);
@@ -368,10 +389,11 @@ void test_group_error_messages(test_suite* suite) {
     passed = (strcmp(actual, "Failed to execute command\n") == 0);
     test_print_str("execvp fail msg exact: \"Failed to execute command\\n\"", passed,
                    "Failed to execute command\n", actual);
-    if (passed)
+    if (passed) {
         suite->passed++;
-    else
+    } else {
         suite->failed++;
+    }
 }
 
 /* ===== MAIN TEST RUNNER ===== */

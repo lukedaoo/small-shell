@@ -21,5 +21,9 @@ test:
 	rm -f mysh_test.o
 	./$(TEST_TARGET)
 
+test-binary:
+	$(CC) $(CFLAGS) -c $(SRC) -o $(TARGET)
+	bash test_mysh_binary.sh
+
 clean:
 	rm -f $(TARGET) $(TEST_TARGET)
