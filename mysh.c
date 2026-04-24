@@ -26,7 +26,7 @@ void dir_current_get(char* buffer, int buffer_size); /* get current directory */
 void io_input_get(char* buffer, int buffer_size);    /* get user input */
 int io_input_validate(char* buffer);                 /* validate user input */
 void io_print_str(char* str);                        /* print string */
-void io_print_error(char* str);                      /* print error */
+void io_print_error(const char* str);                /* print error */
 void io_print_prompt(char* current_dir, char* separator, char* prompt); /* print prompt */
 
 /* commands */
@@ -46,12 +46,10 @@ void cmd_pwd_execute(void);                         /* print working directory *
 
 void run_shell(void); /* main entry point */
 
-#ifndef TEST_MODE
 int main() {
     run_shell();
     return EXIT_SUCCESS;
 }
-#endif
 
 void run_shell(void) {
     char io_input_value[COMMAND_LIMIT_LENGTH];
@@ -66,7 +64,7 @@ void run_shell(void) {
         io_input_get(io_input_value, COMMAND_LIMIT_LENGTH);
         // 4. validate user input
         if (!io_input_validate(io_input_value)) {
-            io_print_error("Invalid input\n");
+            io_print_error("Invalid input");
             continue;
         }
         // 5. extract command
@@ -74,7 +72,7 @@ void run_shell(void) {
         cmd_arguments_extract(io_input_value, arguments);
         // 6. validate arguments
         if (!cmd_arguments_validate(arguments)) {
-            io_print_error("Invalid arguments for command\n");
+            io_print_error("Invalid arguments for command");
             continue;
         }
         // 7. execute command
@@ -98,7 +96,7 @@ void io_input_get(char* buffer, int buffer_size) {
         // exit when user pressed ctrl + d
         cmd_exit_execute();
     } else {
-        io_print_error("fgets failed\n");
+        io_print_error("fgets failed");
     }
     buffer[0] = '\0';
 }
@@ -130,19 +128,21 @@ int io_input_validate(char* buffer) {
 
 void io_print_str(char* str) {
     if (str == NULL) return;
-    printf("%s", str);
-}
-
-void io_print_prompt(char* current_dir, char* separator, char* prompt) {
-    io_print_str(current_dir);
-    io_print_str(separator);
-    io_print_str(prompt);
+    fprintf(stdout, "%s\n", str);
     fflush(stdout);
 }
 
-void io_print_error(char* str) {
+void io_print_prompt(char* current_dir, char* separator, char* prompt) {
+    char full_prompt[DIRECTORY_LIMIT_PATH_LENGTH + 128];
+    snprintf(full_prompt, sizeof(full_prompt), "%s%s%s", current_dir, separator, prompt);
+    fprintf(stdout, "%s", full_prompt);
+    fflush(stdout);
+}
+
+void io_print_error(const char* str) {
     if (str == NULL) return;
-    fprintf(stderr, "%s", str);
+    fprintf(stderr, "%s\n", str);
+    fflush(stderr);
 }
 
 /* commands implementations */
@@ -205,10 +205,10 @@ void cmd_command_execute_external(char** arguments) {
     }
     int child_pid = fork();
     if (child_pid < 0) {
-        io_print_error("Failed to create process\n");
+        io_print_error("Failed to create process");
     } else if (child_pid == 0) {
         if (execvp(arguments[0], arguments) == -1) {
-            io_print_error("Failed to execute command\n");
+            io_print_error("Failed to execute command");
         }
         exit(EXIT_FAILURE);
     } else {
@@ -239,13 +239,13 @@ void cmd_cd_execute(char** arguments) {
         target_path = getenv("HOME");
 
         if (target_path == NULL) {
-            io_print_error("HOME environment variable not set\n");
+            io_print_error("HOME environment variable not set");
             return;
         }
     }
 
     if (chdir(target_path) != 0) {
-        io_print_error("Could not change directory\n");
+        io_print_error("Could not change directory");
     }
 }
 
@@ -253,5 +253,4 @@ void cmd_pwd_execute(void) {
     char buffer[DIRECTORY_LIMIT_PATH_LENGTH];
     dir_current_get(buffer, DIRECTORY_LIMIT_PATH_LENGTH);
     io_print_str(buffer);
-    io_print_str("\n");
 }

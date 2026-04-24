@@ -16,7 +16,9 @@ run:
 	./$(TARGET)
 
 test:
-	$(CC) $(CFLAGS) $(TEST_SRC) $(SRC) -o $(TEST_TARGET) -DTEST_MODE
+	$(CC) $(CFLAGS) -c $(SRC) -Dmain=_mysh_main -o mysh_test.o
+	$(CC) $(CFLAGS) $(TEST_SRC) mysh_test.o -o $(TEST_TARGET)
+	rm -f mysh_test.o
 	./$(TEST_TARGET)
 
 clean:

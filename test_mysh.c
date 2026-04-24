@@ -323,7 +323,7 @@ void test_group_builtin_pwd(test_suite* suite) {
 }
 
 /* ===== TEST GROUP 6: Error messages (stderr exact strings) ===== */
-void io_print_error(char* str);
+void io_print_error(const char* str);
 
 void test_group_error_messages(test_suite* suite) {
     printf("\n=== TEST GROUP 6: Error Messages (stderr exact strings) ===\n");
@@ -338,7 +338,7 @@ void test_group_error_messages(test_suite* suite) {
 
     /* test "Failed to create process\n" */
     dup2(pipefd[1], STDERR_FILENO);
-    io_print_error("Failed to create process\n");
+    io_print_error("Failed to create process");
     fflush(stderr);
     dup2(saved_stderr, STDERR_FILENO);
 
@@ -356,7 +356,7 @@ void test_group_error_messages(test_suite* suite) {
     /* test "Failed to execute command\n" */
     pipe(pipefd);
     dup2(pipefd[1], STDERR_FILENO);
-    io_print_error("Failed to execute command\n");
+    io_print_error("Failed to execute command");
     fflush(stderr);
     dup2(saved_stderr, STDERR_FILENO);
     close(saved_stderr);
