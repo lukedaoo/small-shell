@@ -146,26 +146,25 @@ void io_print_error(const char* str) {
 /* commands implementations */
 void cmd_arguments_extract(char* user_input_buffer, char** arguments) {
     if (user_input_buffer == NULL || arguments == NULL) return;
+
     char* token;
     char* save_ptr;
     int i = 0;
 
-    token = strtok_r(user_input_buffer, " \t\n\r", &save_ptr);
-    while (token != NULL) {
-        if (i < COMMAND_LIMIT_NUM_OF_ARG_LENGTH - 1) {
-            arguments[i++] = token;
-        } else {
-            break;
-        }
-        token = strtok_r(NULL, " \t\n\r", &save_ptr);
+    const char* delims = " \t\n\r";
+
+    token = strtok_r(user_input_buffer, delims, &save_ptr);
+
+    while (token != NULL && i < (COMMAND_LIMIT_NUM_OF_ARG_LENGTH - 1)) {
+        arguments[i++] = token;
+        token = strtok_r(NULL, delims, &save_ptr);
     }
+
     arguments[i] = NULL;
 }
 
 int cmd_arguments_validate(char** arguments) {
-    if (arguments == NULL || arguments[0] == NULL) {
-        return TRUE;
-    }
+    if (arguments == NULL || arguments[0] == NULL) return TRUE;
     int i = 0;
     while (arguments[i] != NULL) {
         i++;
@@ -198,9 +197,7 @@ void cmd_command_execute(char** arguments) {
 }
 
 void cmd_command_execute_external(char** arguments) {
-    if (arguments == NULL || arguments[0] == NULL) {
-        return;
-    }
+    if (arguments == NULL || arguments[0] == NULL) return;
     const int child_pid = fork();
     if (child_pid < 0) {
         io_print_error("Failed to create process");
@@ -216,9 +213,7 @@ void cmd_command_execute_external(char** arguments) {
 }
 
 void cmd_command_execute_bultin(char** arguments, command_type type) {
-    if (arguments == NULL || arguments[0] == NULL) {
-        return;
-    }
+    if (arguments == NULL || arguments[0] == NULL) return;
     if (type == COMMAND_TYPE_BUILTIN_CD) {
         cmd_cd_execute(arguments);
     } else if (type == COMMAND_TYPE_BUILTIN_PWD) {
